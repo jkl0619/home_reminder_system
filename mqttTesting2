@@ -1,0 +1,42 @@
+##https://www.eclipse.org/paho/clients/python/docs/
+
+import paho.mqtt.client as mqtt
+
+client_name = 'motion_sensor_0'
+
+Client(client_id="", clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp")
+#client_id = preset or randomly generated if blank
+#clean_session = keep or detele client information if there is a disconnect
+#userdata = user defined data type of payload, user_set_data can change this later
+#protocall = what type of protocol will be used
+client =mqtt.Client(client_name)
+#client_name = name of the client
+client.connect(host, port=1883, keepalive=60, bind_address="")
+#host = host IP
+#port = host port
+#keep alive = time in seconds between sending data?
+#bind_address = the IP of a local network interface to bind the client to
+client.publish(topic, payload=None, qos=0, retain=False)      #sends message from client to broker
+#topic = topci name
+#payload = data
+#qos = quality of service level to used
+#retain = if set to true, the message will be set as the last known successful message 
+###returns a MQTTMessageInfo datatype which expose a few attributes about the message
+subscribe(topic, qos=0)      #subscribe the cient to a topic
+#topic = topic name
+#qos = quality of service level, default = 0
+
+def on_subscribe(client, userdata, mid, granted_qos):     #when the broker responds to connection request
+	print("subscribed to desired topic")
+#####USE THIS TO GET THE ORIGINAL THRESHOLDS FOR THAT NODE####
+#client = client instance for the callback
+#userdata = private user data set on initialization
+#mid = value returned from the subscribe() call above
+#granted_qos = the qos that the broker has alloted for the client
+
+
+
+
+
+
+
