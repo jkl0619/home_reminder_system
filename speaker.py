@@ -1,5 +1,8 @@
-import gTTS
+from gtts import gTTS
+import paho.mqtt.client as mqtt
 import os
+
+topic = 'netapphome/alert/0'
 
 #message callback function
 def on_message(client, userdata, message):
@@ -12,16 +15,13 @@ def on_connect(client, userdata, flags, rc):
 	client.subscribe(topic)
 
 #MQTT client setup
-host = "127.0.0.1"
-client_name = 'sink_sensor_0'
-topic = "ALERT_SINK_0"
-Client(client_id="", clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp")
-client = mqtt.Client(client_name)
+client = mqtt.Client()
 client.on_message = on_message
 client.on_connect = on_connect
-client.connect(host, port=1883, keepalive=60, bind_address="")
+client.connect("m2m.eclipse.org", 1883)
 
 
 #look for messages
 client.loop_forever()
+
 
