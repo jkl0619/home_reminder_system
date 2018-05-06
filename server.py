@@ -14,16 +14,25 @@ def on_connect(mqttc, obj, flags, rc):
 # 1. Different sensors to "Change" thresholds
 # 2. Do things with the warning messages?
 
+currentRoom = 0
 def on_message(mqttc, obj, msg):
+    global currentRoom
     decoded_message = str(msg.payload, 'utf-8')
-    if(msg.topic == "netapphome/bathroom"):
-        publish.single("netapphome/bathroom/sensor", decoded_message, hostname="m2m.eclipse.org")
-        print("the message: " + decoded_message + " was sent to the bathroom sensor")
-    elif( msg.topic == "netapphome/kitchen"):
-        publish.single("netapphome/kitchen/sensor", decoded_message, hostname="m2m.eclipse.org")
-        print("the message: " + decoded_message + " was sent to the kitchen sensor")
-    else:
-        print("the message was: " + decoded_message)
+    if(msg.topic == "netapphome/roomstatus/0"):
+        currentRoom = 0
+        print("someone came into room: " + str(currentRoom) )
+    elif (msg.topic == "netapphome/roomstatus/1"):
+        currentRoom = 1
+        print("someone came into room: " + str(currentRoom))
+    elif (msg.topic == "netapphome/warning"):
+        # Have ALL warning messages publish to this topic.
+        # The message should be the details specific.
+        topic_to_publish = "netapphome/alert/" + str(currentRoom)
+        publish.single(topic_to_publish, decoded_message, hostname="m2m.eclipse.org")
+        print(currentRoom)
+    elif (msg.topic == "bojangle"):
+        topisd = 2
+        print(topisd)
 
 def on_publish(mqttc, obj, mid):
     print("mid: " + str(mid))
@@ -42,7 +51,3 @@ mqttc.connect("m2m.eclipse.org", 1883)
 mqttc.subscribe("netapphome/#", 0)
 
 mqttc.loop_forever()
-
-while(1):
-    dj = input("Please input something")
-    print(str(dj) + " was the input")
