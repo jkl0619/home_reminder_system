@@ -40,6 +40,13 @@ mqttc.subscribe("netapphome/kitchen/watersensor", 0)
 mqttc.loop_start()
 
 while True:
+    global pouring
+    global lastPinState
+    global pinstate
+    global lastPinChange
+    global pourStart
+    global pinChange
+    global pinDelta
     currentTime = int(time.time() * 1000)
     if GPIO.input(FLOW_SENSOR):
         pinstate = True
