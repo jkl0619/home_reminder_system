@@ -13,8 +13,11 @@ GPIO.setup(FLOW_SENSOR, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 topic_to_publish = "netapphome/warning"
 
 # initialize variables
-prevState = False
-currentState = False
+global count
+count = 0
+pouring = False
+lastPinState = False
+pinState = 0
 lastPinChange = int(time.time() * 1000)
 pourStart = 0
 pinChange = lastPinChange
@@ -29,7 +32,6 @@ def on_message(mqttc, obj, msg):
     decoded_message = str(msg.payload, 'utf-8')
     new_threshold = int(decoded_message)
     thresholdTime = new_threshold
-    print("Threshold changed to " + thresholdTime)
 
 mqttc = mqtt.Client()
 mqttc.on_message = on_message
@@ -37,20 +39,35 @@ mqttc.connect("m2m.eclipse.org", 1883)
 mqttc.subscribe("netapphome/kitchen/watersensor", 0)
 mqttc.loop_start()
 
-
-def countPulse(channel):
-    global prevState
-    global currentState
-    currentTime = int(time.time() * 1000)
-
-
-
-GPIO.add_event_detect(FLOW_SENSOR, GPIO.FALLING, callback=countPulse)
 while True:
-    if GPIO.input(FLOW_SENSOR):
-        print("port " + FLOW_SENSOR + " is working")
-    try:
-        time.sleep(1)
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-        print("Leaving!")
+    global pouring
+    global lastPinState
+    global pinstate
+    global lastPinChange
+    global pourStart
+    global pinChange
+    global pinDelta
+    currentTime = int(time.time() * 1000)
+    if GPIO.input(FLOW_SENSOR) == GPIO.HIGH:
+        pinstate = True
+    else:
+        pinstate = False
+        print("No input")
+    if (pinState != lastPinState and pinState == True):
+        if (pouring == False):
+            pourStart = currentTime
+            print("pour has started")
+        pouring = True
+        # get the current time
+        pinChange = currentTime
+        pinDelta = pinChange - lastPinChange
+    if (pouring == True and pinState != lastPinState and (currentTime - lastPinChange) > thresholdTime):
+        message = "The water has been left on for too long in the kitchen!"
+        publish.single(topic_to_publish, message, hostname="m2m.eclipse.org")
+        print("Message published")
+    if (pouring == True and pinState == lastPinState and (currentTime - lastPinChange) > 3000):
+        # set pouring back to false. Essentially, if no input for about 3 seconds, then it is considered as to have stopped pouring.
+        pouring = False
+        pourTime = int((currentTime - pourStart)/1000) - 3
+    lastPinChange = pinChange
+    lastPinState = pinState
