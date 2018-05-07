@@ -39,20 +39,14 @@ mqttc.connect("m2m.eclipse.org", 1883)
 mqttc.subscribe("netapphome/kitchen/watersensor", 0)
 mqttc.loop_start()
 
+GPIO.add_event_detect(FLOW_SENSOR, GPIO.RISING)
+
 while True:
-    global pouring
-    global lastPinState
-    global pinstate
-    global lastPinChange
-    global pourStart
-    global pinChange
-    global pinDelta
     currentTime = int(time.time() * 1000)
-    if GPIO.input(FLOW_SENSOR) == GPIO.HIGH:
+    if GPIO.event_detected(FLOW_SENSOR):
         pinstate = True
     else:
         pinstate = False
-        print("No input")
     if (pinState != lastPinState and pinState == True):
         if (pouring == False):
             pourStart = currentTime
