@@ -42,6 +42,7 @@ mqttc.loop_start()
 
 while True:
     currentTime = int(time.time() * 1000)
+    print(currentTime)
     if GPIO.input(FLOW_SENSOR):
         pinstate = True
         print("There is an input")
@@ -62,4 +63,6 @@ while True:
         # set pouring back to false. Essentially, if no input for about 3 seconds, then it is considered as to have stopped pouring.
         pouring = False
         pourTime = int((currentTime - pourStart)/1000) - 3
+    lastPinChange = pinChange
+    lastPinState = pinState
 
