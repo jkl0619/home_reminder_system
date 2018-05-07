@@ -1,3 +1,3 @@
-system_information{
-'name' = 'chris'
+system_information = {
+'name' : 'chris'
 }
