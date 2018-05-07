@@ -33,6 +33,7 @@ print("SENSOR ACTIVE\n");
 inRoom = False
 sent = False
 lights = False
+GPIO.output(pins['led_pin'], GPIO.LOW)
 while 1:			#constantly check if the PIR sensor has seen motion
 	if GPIO.input(pins['data_in']) == GPIO.HIGH:			#sensor will display a high value in the event that there is any motion detected
 		time.sleep(7.5)										#slight delay since the sensor will have a high value for about 5s
