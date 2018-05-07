@@ -4,8 +4,6 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
 
-GPIO.cleanup()
-
 #initialize sensors
 FLOW_SENSOR = 23
 
@@ -45,12 +43,14 @@ while True:
     currentTime = int(time.time() * 1000)
     if GPIO.input(FLOW_SENSOR):
         pinstate = True
-        print("There is an input")
+        print("Input")
     else:
         pinstate = False
+        print("No input")
     if (pinState != lastPinState and pinState == True):
         if (pouring == False):
             pourStart = currentTime
+            print("pour has started")
         pouring = True
         # get the current time
         pinChange = currentTime
